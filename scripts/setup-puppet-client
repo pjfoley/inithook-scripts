@@ -34,6 +34,6 @@ echo $'\t'"* Updating package index files"
 apt-get update >/dev/null
 
 echo $'\t'"* Installing Puppet Client packages - ${PACKAGES}"
-apt-get install -y "${PACKAGES}" >/dev/null
+apt-get install -y ${PACKAGES} >/dev/null
 
 echo "Finished - Setting up Puppet Client Packages"
