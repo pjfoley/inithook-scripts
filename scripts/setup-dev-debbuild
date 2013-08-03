@@ -32,10 +32,10 @@ if [ "${DISTRO}" != "debian" ]; then
 fi
 
 echo $'\t'"* Updating package index files"
-#apt-get update >/dev/null
+apt-get update >/dev/null
 
 echo $'\t'"* Installing DEB Build packages - ${PACKAGES}"
-#apt-get install -y "${PACKAGES}" >/dev/null
+apt-get install -y ${PACKAGES} >/dev/null
 
 if ! id -u "${DEBBUILD_USR}" >/dev/null 2>&1 ; then
   echo "Creating User"
