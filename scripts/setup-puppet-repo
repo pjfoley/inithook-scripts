@@ -1,9 +1,30 @@
 #!/bin/bash
+###############################################################
+#  This bootstraps installing Puppet on Debian based systems  #
+###############################################################
+set -e
 
+# Load defaults for script if file exists
+[ -e /etc/default/inithook-scripts/puppet-repo ] && . /etc/default/inithook-scripts/puppet-repo
 
-CODENAME=$(lsb_release -cs | tr '[A-Z]' '[a-z]')
-DISTRO=$(lsb_release -is | tr '[A-Z]' '[a-z]')
+CODENAME="${CODENAME:=$(lsb_release -cs | tr '[A-Z]' '[a-z]')}"
+DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
 
-[ ! "${DISTRO}" == "debian" ] && echo "Puppet Repo Setup - Operating System Not Supported"; exit 1
+REPO_PROTO="${REPO_PROTO:=https}"
+REPO_URL="${PUPPET_REPO:=apt.pupppetlabs.com}"
+DEB_NAME="${DEB_NAME:=puppetlabs-release-${CODENAME}.deb}"
 
+PROTO_URL_DEB="${PROTO_URL_DEB:=${REPO_PROTO}://${REPO_URL}/${DEB_NAME}}"
+
+echo "SETUP - Puppetlabs APT Repo source"
+
+if [[ "$EUID" -ne "0" ]]; then
+  echo "This script must be run as root."
+  exit 1
+fi
+
+if [ "${DISTRO}" != "debian" ]; then
+  echo "Puppet Repo Setup - Operating System Not Supported"
+  exit 1
+fi
 
