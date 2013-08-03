@@ -1,0 +1,40 @@
+#!/bin/bash
+####################################################################
+#  This script will install the puppet agent and related packages  #
+####################################################################
+set -e
+
+# Load defaults for script if file exists
+[ -e /etc/default/inithook-scripts/puppet-client ] && . /etc/default/inithook-scripts/puppet-client
+
+CODENAME="${CODENAME:=$(lsb_release -cs | tr '[A-Z]' '[a-z]')}"
+DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
+
+PACKAGES="${PACKAGES:=puppet rdoc}"
+
+###############################################################
+#  No tunables below this point                               #
+###############################################################
+
+echo "SETUP - Puppet Client Packages"
+
+if [[ "$EUID" -ne "0" ]]; then
+  echo $'\t'"* This script must be run as root..."
+  echo "Exiting..."
+  exit 1
+fi
+
+if [ "${DISTRO}" != "debian" ]; then
+  echo $'\t'"* Operating System not supported..."
+  echo "Exiting..."
+  exit 1
+fi
+
+
+echo $'\t'"* Updating package index files"
+apt-get update >/dev/null
+
+echo $'\t'"* Installing Puppet Client packages - ${PACKAGES}"
+#apt-get update >/dev/null
+
+echo "Finished - Setting up Puppet Client Packages"
