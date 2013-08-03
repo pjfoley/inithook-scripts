@@ -36,19 +36,21 @@ trap cleanUP EXIT
 echo "SETUP - Puppetlabs APT Repo"
 
 if [[ "$EUID" -ne "0" ]]; then
-  echo "${PADDING}* This script must be run as root... Exiting."
+  echo $'\t'"* This script must be run as root..."
+  echo "Exiting..."
   exit 1
 fi
 
 if [ "${DISTRO}" != "debian" ]; then
-  echo "${PADDING}* Puppet Repo Setup - Operating System Not Supported... Exiting."
+  echo $'\t'"* Puppet Repo Setup - Operating System Not Supported..."
+  echo "Exiting..."
   exit 1
 fi
 
-echo "${PADDING}* Downloading - ${DEB_NAME}"
+echo $'\t'"* Downloading - ${DEB_NAME}"
 wget -qO ${deb_path} ${PROTO_URL_DEB}
 
-echo "${PADDING}* Installing - ${DEB_NAME}"
+echo $'\t'"* Installing - ${DEB_NAME}"
 dpkg -i "${deb_path}" >/dev/null
 
 echo "Finished - Setting up Puppetlabs APT Repo"
