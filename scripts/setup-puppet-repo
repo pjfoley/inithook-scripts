@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+CODENAME=$(lsb_release -cs | tr '[A-Z]' '[a-z]')
+DISTRO=$(lsb_release -is | tr '[A-Z]' '[a-z]')
+
+[ ! "${DISTRO}" == "debian" ] && echo "Puppet Repo Setup - Operating System Not Supported"; exit 1
+
+
