@@ -1,0 +1,46 @@
+#!/bin/bash
+####################################################################
+#  This script will install the puppet agent and related packages  #
+####################################################################
+set -e
+
+# Load defaults for script if file exists
+[ -e /etc/default/inithook-scripts/dev-debbuild ] && . /etc/default/inithook-scripts/dev-debbuild
+
+
+DEBBUILD_USR="${DEBBUILD_USR:=debbuild}"
+DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
+
+PACKAGES="${PACKAGES:=build-essential devscripts debhelper}"
+
+###############################################################
+#  No tunables below this point                               #
+###############################################################
+
+echo "SETUP - Development DEB Build environment"
+
+if [[ "$EUID" -ne "0" ]]; then
+  echo $'\t'"* This script must be run as root..."
+  echo "Exiting..."
+  exit 1
+fi
+
+if [ "${DISTRO}" != "debian" ]; then
+  echo $'\t'"* Operating System not supported..."
+  echo "Exiting..."
+  exit 1
+fi
+
+echo $'\t'"* Updating package index files"
+#apt-get update >/dev/null
+
+echo $'\t'"* Installing DEB Build packages - ${PACKAGES}"
+#apt-get install -y "${PACKAGES}" >/dev/null
+
+if ! id -u "${DEBBUILD_USR}" >/dev/null 2>&1 ; then
+  echo "Creating User"
+  
+fi
+
+
+echo "Finished - Development DEB Build environment"
