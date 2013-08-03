@@ -11,20 +11,44 @@ CODENAME="${CODENAME:=$(lsb_release -cs | tr '[A-Z]' '[a-z]')}"
 DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
 
 REPO_PROTO="${REPO_PROTO:=https}"
-REPO_URL="${PUPPET_REPO:=apt.pupppetlabs.com}"
+REPO_URL="${PUPPET_REPO:=apt.puppetlabs.com}"
 DEB_NAME="${DEB_NAME:=puppetlabs-release-${CODENAME}.deb}"
 
 PROTO_URL_DEB="${PROTO_URL_DEB:=${REPO_PROTO}://${REPO_URL}/${DEB_NAME}}"
 
-echo "SETUP - Puppetlabs APT Repo source"
+PADDING="    "
+
+###############################################################
+#  No tunables below this point                               #
+###############################################################
+
+# Create TMP directory and file
+tmpDIR=$(mktemp -d -t "$(basename $0).XXXXX")
+deb_path=$(mktemp --tmpdir="${tmpDIR}" "${DEB_NAME}.XXXXXXX")
+
+# Clean up temporary directory and files on exit
+function cleanUP
+{
+  rm -Rf "$tmpDIR"
+}
+trap cleanUP EXIT
+
+echo "SETUP - Puppetlabs APT Repo"
 
 if [[ "$EUID" -ne "0" ]]; then
-  echo "This script must be run as root."
+  echo "${PADDING}* This script must be run as root... Exiting."
   exit 1
 fi
 
 if [ "${DISTRO}" != "debian" ]; then
-  echo "Puppet Repo Setup - Operating System Not Supported"
+  echo "${PADDING}* Puppet Repo Setup - Operating System Not Supported... Exiting."
   exit 1
 fi
 
+echo "${PADDING}* Downloading - ${DEB_NAME}"
+wget -qO ${deb_path} ${PROTO_URL_DEB}
+
+echo "${PADDING}* Installing - ${DEB_NAME}"
+dpkg -i "${deb_path}" >/dev/null
+
+echo "Finished - Setting up Puppetlabs APT Repo"
