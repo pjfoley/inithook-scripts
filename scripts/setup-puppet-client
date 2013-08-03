@@ -30,11 +30,10 @@ if [ "${DISTRO}" != "debian" ]; then
   exit 1
 fi
 
-
 echo $'\t'"* Updating package index files"
 apt-get update >/dev/null
 
 echo $'\t'"* Installing Puppet Client packages - ${PACKAGES}"
-#apt-get update >/dev/null
+apt-get install -y "${PACKAGES}" >/dev/null
 
 echo "Finished - Setting up Puppet Client Packages"
