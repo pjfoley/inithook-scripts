@@ -40,7 +40,7 @@ if [[ "$EUID" -ne "0" ]]; then
 fi
 
 if [ "${DISTRO}" != "debian" ]; then
-  echo $'\t'"* Puppet Repo Setup - Operating System Not Supported..."
+  echo $'\t'"* Operating System not supported..."
   echo "Exiting..."
   exit 1
 fi
