@@ -16,8 +16,6 @@ DEB_NAME="${DEB_NAME:=puppetlabs-release-${CODENAME}.deb}"
 
 PROTO_URL_DEB="${PROTO_URL_DEB:=${REPO_PROTO}://${REPO_URL}/${DEB_NAME}}"
 
-PADDING="    "
-
 ###############################################################
 #  No tunables below this point                               #
 ###############################################################
