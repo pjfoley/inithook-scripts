@@ -39,7 +39,7 @@ apt-get install -y ${PACKAGES} >/dev/null
 
 if ! id -u "${DEBBUILD_USR}" >/dev/null 2>&1 ; then
   echo "Creating User"
-  useradd -m -s /bin/bash $DEBBUILD_USR
+  useradd -m -s /bin/bash $DEBBUILD_USR -G sudo
 fi
 
 echo "Finished - Development DEB Build environment"
