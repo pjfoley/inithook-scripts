@@ -1,0 +1,27 @@
+#!/bin/bash
+####################################################################
+#  This script will regen all the host keys                        #
+####################################################################
+# Exit on unhandled error
+set -o errexit
+
+# Load defaults for script if file exists
+
+SSH_TYPES="rsa dsa ecdsa"
+SSH_CONF="/etc/ssh/"
+
+# remove existing ssh keys and generate new ones
+# note: ssh daemon needs to be restarted for changes to take effect
+
+echo "* Regenerating SSH cryptographic keys"
+
+if [[ "$EUID" -ne "0" ]]; then
+  echo $'\t'"* This script must be run as root..."
+  echo "Exiting..."
+  exit 1
+fi
+
+for l_type in $SSH_TYPES ; do
+  rm -f "${SSH_CONF}/ssh_host_${l_type}_key*"
+  ssh-keygen -q -f "${SSH_CONF}/ssh_host_${l_type}_key" -N '' -t ${l_type}
+done
