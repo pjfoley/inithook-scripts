@@ -11,7 +11,7 @@ set -e
 DEBBUILD_USR="${DEBBUILD_USR:=debbuild}"
 DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
 
-PACKAGES="${PACKAGES:=sudo build-essential devscripts debhelper}"
+PACKAGES="${PACKAGES:=sudo build-essential devscripts debhelper dh-make fakeroot lintian pbuilder}"
 
 ###############################################################
 #  No tunables below this point                               #
