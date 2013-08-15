@@ -1,0 +1,133 @@
+#!/bin/bash
+####################################################################
+#  This script will setup the user accounts                        #
+####################################################################
+# Exit on unhandled error or where variable is unset
+set -o errexit
+set -o nounset
+
+DEFAULTS_FILE="${DEFAULTS_FILE:=/etc/default/inithook-scripts/setup-users}"
+
+# If no Defaults File exit
+[ ! -e "${DEFAULTS_FILE}" ] && exit
+
+. "${DEFAULTS_FILE}"
+
+#Note - The Users home directory is pre-pended below
+AUTH_FILE="${AUTH_FILE:=/.ssh/authorized_keys}"
+KNOWN_HOSTS_FILE="${KNOWN_HOSTS_FILE:=/.ssh/known_hosts}"
+
+###############################################################
+#  No tunables below this point                               #
+###############################################################
+
+echo "SETUP - Setting up users"
+
+if [[ "$EUID" -ne "0" ]]; then
+  echo $'\t'"* This script must be run as root..."
+  echo "Exiting..."
+  exit 1
+fi
+
+f_CURRENT_DIR="${PWD}"
+for l_user in ${USERS} ; do
+
+  set +o nounset
+  l_user_shell="${user_shell[$l_user]}"
+  l_user_groups="${user_groups[$l_user]}"
+  l_user_home="${user_home[$l_user]}"
+  l_user_gecos="${user_gecos[$l_user]}"
+  l_user_pubkey="${user_pubkey[$l_user]}"
+  l_dotfiles_defaults="${dotfiles_defaults[$l_user]}"
+  l_dotfiles_clone="${dotfiles_clone[$l_user]}"
+  l_dotfiles_install="${dotfiles_install[$l_user]}"
+  set -o nounset
+
+  #Call system functions to get user and group membership details if user exists
+  set +o errexit
+  user_passwd="$(getent passwd ${l_user})"
+  user_exists=$?
+  user_groups="$(id -Gn ${l_user} 2>/dev/null)" 
+  set -o errexit
+
+#  echo "Defaults"
+#  echo "User: ${l_user}"
+#  echo "    Shell: ${l_user_shell}"
+#  echo "    Groups: ${l_user_groups}"
+#  echo "    Home: ${l_user_home}"
+#  echo "    Fullname: ${l_user_gecos}"
+#  echo "    Pubkey: ${l_user_pubkey}"
+#  echo "    Defaults: ${l_dotfiles_defaults}"
+#  echo "    Clone: ${l_dotfiles_clone}"
+#  echo "    Install: ${l_dotfiles_install}"
+#  echo
+#  echo "Known Hosts:"
+#  echo -e "${SSH_KNOWN_HOSTS}"
+#  echo
+  
+  if [ $user_exists -eq 0 ] ; then
+    moduser_opts=""
+#    echo "User exists: ${l_user}"
+
+    [ ! "${l_user_shell}" == "$(echo ${user_passwd} | cut -d: -f7)" ] && moduser_opts+="--shell ${l_user_shell} "
+    [ ! "${l_user_home}" == "$(echo ${user_passwd} | cut -d: -f6)" ] && moduser_opts+="--move-home ${l_user_home} "
+    [ ! "${l_user_gecos}" == "$(echo ${user_passwd} | cut -d: -f5)" ] && moduser_opts+="--comment '${l_user_gecos}' "
+
+
+    #Only add groups that exists
+    if [ ${#l_user_groups} -ne 0 ] ; then
+      valid_groups=""
+      for l_group in ${l_user_groups//,/ } ; do
+        [ $(egrep -i "^$l_group:" /etc/group 2>/dev/null) ] && valid_groups+="${l_group},"
+      done
+      moduser_opts+="--groups ${valid_groups%,} "
+    fi
+
+    [ ${#moduser_opts} -ne 0 ] &&  usermod ${moduser_opts% } ${l_user}
+
+  else
+    adduser_opts="--create-home "
+#    echo "User doesnt exist: ${l_user}"
+
+    [ ${#l_user_shell} -ne 0 ] && adduser_opts+="--shell ${l_user_shell} "
+    [ ${#l_user_home} -ne 0 ] && adduser_opts+="--home-dir ${l_user_home} "
+    [ ${#l_user_gecos} -ne 0 ] && adduser_opts+="--comment '${l_user_gecos}' "
+
+    #Only add groups that exists
+    if [ ${#l_user_groups} -ne 0 ] ; then
+      valid_groups=""
+      for l_group in ${l_user_groups//,/ } ; do
+        [ $(egrep -i "^$l_group:" /etc/group 2>/dev/null) ] && valid_groups+="${l_group},"
+      done
+      adduser_opts+="--groups ${valid_groups%,} "
+    fi
+
+    useradd ${adduser_opts% } ${l_user}
+  fi
+
+  sudo -u $l_user bash << EOF
+    cd ~
+    mkdir -p $(dirname $l_user_home/$AUTH_FILE) && chmod 700 $(dirname $l_user_home/$AUTH_FILE) && touch $l_user_home/$AUTH_FILE && chmod 600 $l_user_home/$AUTH_FILE
+
+    touch $l_user_home/$KNOWN_HOSTS_FILE && echo -e $SSH_KNOWN_HOSTS >> $l_user_home/$KNOWN_HOSTS_FILE
+
+    if [ ${#l_user_pubkey} -ne 0 ] ; then wget -qO- $l_user_pubkey >> $l_user_home/$AUTH_FILE ; fi
+    if [ ${#l_dotfiles_defaults} -ne 0 ] ; then 
+      wget -qO- $l_dotfiles_defaults | bash 
+
+      if [ ${#l_dotfiles_clone} -ne 0 ] ; then 
+        wget -qO- $l_dotfiles_clone | bash 
+        if [ ${#l_dotfiles_install} -ne 0 ] ; then 
+          . ~/default/dotfiles
+          eval $l_dotfiles_install
+        fi
+      fi
+    fi
+EOF
+done
+
+cd "${f_CURRENT_DIR}"
+
+[ "${DELETE_DEFAULTS_FILE_AFTER_RUN}" == "true" ] && rm $DEFAULTS_FILE
+
+echo "Finished - Setting up users"
