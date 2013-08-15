@@ -83,7 +83,7 @@ for l_user in ${USERS} ; do
       moduser_opts+="--groups ${valid_groups%,} "
     fi
 
-    [ ${#moduser_opts} -ne 0 ] &&  usermod ${moduser_opts% } ${l_user}
+    [ ${#moduser_opts} -ne 0 ] &&  eval usermod ${moduser_opts% } ${l_user}
 
   else
     adduser_opts="--create-home "
@@ -102,7 +102,7 @@ for l_user in ${USERS} ; do
       adduser_opts+="--groups ${valid_groups%,} "
     fi
 
-    useradd ${adduser_opts% } ${l_user}
+    eval useradd ${adduser_opts% } ${l_user}
   fi
 
   sudo -u $l_user bash << EOF
