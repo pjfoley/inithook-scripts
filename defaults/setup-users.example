@@ -1,0 +1,64 @@
+############################################################################
+#  Defaults file                                                           #
+#     For the setup-users script, part of the inithook-scripts package.    #
+############################################################################
+
+# Script expected location - /etc/default/inithook-scripts/setup-users
+
+# ~~~~~~~~~~~~~~  Example Defaults File ~~~~~~~~~~~~~~~~~~~~
+
+#Space seperated list of users to create/setup
+USERS="root account1 www"
+
+#This controls whether the script will remove the defaults file on completetion
+DELETE_DEFAULTS_FILE_AFTER_RUN=false
+
+#Declare various Hashmaps to store values in
+# User's prefered shell
+declare -A user_shell
+declare -A user_groups        # Comma seperated list of groups for the user
+declare -A user_home
+declare -A user_gecos
+declare -A user_pubkey        # User's Public Key File to appened to ~/.ssh/authorized_keys
+declare -A dotfiles_defaults
+declare -A dotfiles_clone
+declare -A dotfiles_install
+
+#What known hosts do we want to setup for each user (eg GITHUB)
+#use \n for new lines within the file
+#To each host value do ssh-keyscan -H -t rsa github.com
+SSH_KNOWN_HOSTS="Line 1\n"
+SSH_KNOWN_HOSTS+="Line 2"
+
+#Handy block to copy to add new users
+#       user_shell[""]=""
+#        user_home[""]=""
+#      user_groups[""]=""
+#       user_gecos[""]=""
+#      user_pubkey[""]=""
+#dotfiles_defaults[""]=""
+#   dotfiles_clone[""]=""
+# dotfiles_install[""]=""
+
+#Example block for the root user
+       user_shell["root"]="/bin/bash"
+        user_home["root"]="/root"
+      user_groups["root"]="group_one,group_two"
+       user_gecos["root"]="John Smith,2,3,4"
+      user_pubkey["root"]="Public Key ....."
+dotfiles_defaults["root"]="URL location of script to create DOTFILES DEFAULTS"
+   dotfiles_clone["root"]="URL to script to clone your DOTFILES Repo"
+ dotfiles_install["root"]="File to execute to install dotfiles repo"
+
+#Example block for the account1 user
+       user_shell["account1"]="/bin/bash"
+        user_home["account1"]="/home/account1"
+      user_groups["account1"]="sudo,legends,news,proxy,audio"
+       user_gecos["account1"]="Peter Foley,1111,,"
+      user_pubkey["account1"]="Amazing simply"
+
+#Example block for the www user
+       user_shell["www"]="/bin/bash"
+        user_home["www"]="/var/chroot/www"
+      user_groups["www"]="specialgroup"
+       user_gecos["www"]="Web Server,,,"
