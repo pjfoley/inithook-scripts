@@ -109,8 +109,12 @@ for l_user in ${USERS} ; do
     cd ~
     mkdir -p $(dirname $l_user_home/$AUTH_FILE) && chmod 700 $(dirname $l_user_home/$AUTH_FILE) && touch $l_user_home/$AUTH_FILE && chmod 600 $l_user_home/$AUTH_FILE
 
-    touch $l_user_home/$KNOWN_HOSTS_FILE && echo -e $SSH_KNOWN_HOSTS >> $l_user_home/$KNOWN_HOSTS_FILE
-
+    if [ ${$SSH_KNOWN_HOSTS} -ne 0 ] ; then
+      touch $l_user_home/$KNOWN_HOSTS_FILE 
+      for l_site in ${SSH_KNOWN_HOSTS} ; then
+        ssh-keyscan -H -t rsa ${l_site} >> $l_user_home/$KNOWN_HOSTS_FILE
+      done
+    fi
     if [ ${#l_user_pubkey} -ne 0 ] ; then wget -qO- $l_user_pubkey >> $l_user_home/$AUTH_FILE ; fi
     if [ ${#l_dotfiles_defaults} -ne 0 ] ; then 
       wget -qO- $l_dotfiles_defaults | bash 

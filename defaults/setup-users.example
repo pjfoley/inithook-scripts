@@ -25,17 +25,17 @@ declare -A dotfiles_clone
 declare -A dotfiles_install
 
 #What known hosts do we want to setup for each user (eg GITHUB)
-#use \n for new lines within the file
-#To each host value do ssh-keyscan -H -t rsa github.com
-SSH_KNOWN_HOSTS="Line 1\n"
-SSH_KNOWN_HOSTS+="Line 2"
+#use space to sepearte hosts
+# "github.com example.com"
+SSH_KNOWN_HOSTS='Line 1\n'
+SSH_KNOWN_HOSTS+='Line 2'
 
 #Handy block to copy to add new users
 #       user_shell[""]=""
 #        user_home[""]=""
 #      user_groups[""]=""
 #       user_gecos[""]=""
-#      user_pubkey[""]=""
+#      user_pubkey[""]=''
 #dotfiles_defaults[""]=""
 #   dotfiles_clone[""]=""
 # dotfiles_install[""]=""
@@ -45,7 +45,7 @@ SSH_KNOWN_HOSTS+="Line 2"
         user_home["root"]="/root"
       user_groups["root"]="group_one,group_two"
        user_gecos["root"]="John Smith,2,3,4"
-      user_pubkey["root"]="Public Key ....."
+      user_pubkey["root"]='Public Key .....'
 dotfiles_defaults["root"]="URL location of script to create DOTFILES DEFAULTS"
    dotfiles_clone["root"]="URL to script to clone your DOTFILES Repo"
  dotfiles_install["root"]="File to execute to install dotfiles repo"
@@ -55,7 +55,7 @@ dotfiles_defaults["root"]="URL location of script to create DOTFILES DEFAULTS"
         user_home["account1"]="/home/account1"
       user_groups["account1"]="sudo,legends,news,proxy,audio"
        user_gecos["account1"]="Peter Foley,1111,,"
-      user_pubkey["account1"]="Amazing simply"
+      user_pubkey["account1"]='Amazing simply'
 
 #Example block for the www user
        user_shell["www"]="/bin/bash"
