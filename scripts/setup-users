@@ -106,7 +106,7 @@ for l_user in ${USERS} ; do
   fi
 
   if [ ${#SSH_KNOWN_HOSTS} -ne 0 ] ; then
-    touch $l_user_home/$KNOWN_HOSTS_FILE 
+    touch $l_user_home/$KNOWN_HOSTS_FILE && chown $l_user:$l_user $l_user_home/$KNOWN_HOSTS_FILE
     for l_URL in ${SSH_KNOWN_HOSTS} ; do
       ssh-keyscan -H -t rsa ${l_URL} >> $l_user_home/$KNOWN_HOSTS_FILE
     done
