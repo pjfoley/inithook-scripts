@@ -22,6 +22,6 @@ if [[ "$EUID" -ne "0" ]]; then
 fi
 
 for l_type in $SSH_TYPES ; do
-  rm -f "${SSH_CONF}/ssh_host_${l_type}_key*"
+  rm -f "${SSH_CONF}/ssh_host_${l_type}_key"*
   ssh-keygen -q -f "${SSH_CONF}/ssh_host_${l_type}_key" -N '' -t ${l_type}
 done
