@@ -7,6 +7,9 @@ set -e
 # Load defaults for script if file exists
 [ -e /etc/default/inithook-scripts/bootstrap-machine ] && . /etc/default/inithook-scripts/bootstrap-machine
 
+CODENAME="${CODENAME:=$(lsb_release -cs | tr '[A-Z]' '[a-z]')}"
+DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
+
 GEMS="${GEMS:=r10k}"
 
 R10K_BOOTSTRAP="${R10K_BOOTSTRAP:=/root/tmp/r10k_bootstrap.yaml}"
