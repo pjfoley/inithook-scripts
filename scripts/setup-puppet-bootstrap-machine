@@ -1,0 +1,45 @@
+#!/bin/bash
+####################################################################
+#  This script will install the puppet agent and related packages  #
+####################################################################
+set -e
+
+# Load defaults for script if file exists
+[ -e /etc/default/inithook-scripts/bootstrap-machine ] && . /etc/default/inithook-scripts/bootstrap-machine
+
+GEMS="${GEMS:=r10k}"
+
+R10K_BOOTSTRAP="${R10K_BOOTSTRAP:=/root/tmp/r10k_bootstrap.yaml}"
+BOOTSTRAP_PUPPET="${BOOTSTRAP_PUPPET:=/root/tmp/puppet/environments/production}"
+
+###############################################################
+#  No tunables below this point                               #
+###############################################################
+
+echo "SETUP - R10K Bootstrap and machine configuration"
+
+if [[ "$EUID" -ne "0" ]]; then
+  echo $'\t'"* This script must be run as root..."
+  echo "Exiting..."
+  exit 1
+fi
+
+if [ "${DISTRO}" != "debian" ]; then
+  echo $'\t'"* Operating System not supported..."
+  echo "Exiting..."
+  exit 1
+fi
+
+
+echo $'\t'"* Installing Ruby GEMS - ${GEMS}"
+gem install ${GEMS} >/dev/null
+
+echo $'\t'"* Deploy r10k configuration"
+/usr/local/bin/r10k deploy environment -p -c ${R10K_BOOTSTRAP}
+
+echo $'\t'"* Configure base machine settings"
+FACTER_fqdn=$hostname.$domain puppet apply --verbose --hiera_config ${BOOTSTRAP_PUPPET}/hiera.yaml --modulepath=${BOOTSTRAP_PUPPET}/modules/ ${BOOTSTRAP_PUPPET}/bootstrap.pp
+sed -i '/127.0.1.1\(.*\)/d' /etc/hosts
+ifup eth0
+
+echo "Finished - R10K Bootstrap and machine configuration"
