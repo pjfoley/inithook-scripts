@@ -12,7 +12,7 @@ DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
 
 GEMS="${GEMS:=r10k}"
 
-R10K_BOOTSTRAP="${R10K_BOOTSTRAP:=/root/tmp/r10k_bootstrap.yaml}"
+R10K_BOOTSTRAP="${R10K_BOOTSTRAP:=/root/tmp/bootstrap/r10k_bootstrap.yaml}"
 BOOTSTRAP_PUPPET="${BOOTSTRAP_PUPPET:=/root/tmp/bootstrap/puppet/environments/production}"
 
 ###############################################################
