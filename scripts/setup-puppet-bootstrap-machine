@@ -41,7 +41,7 @@ echo $'\t'"* Deploy r10k configuration"
 /usr/local/bin/r10k deploy environment -p -c ${R10K_BOOTSTRAP}
 
 echo $'\t'"* Configure base machine settings"
-"$(set | grep FACTER_ | tr '\n' ' ')" puppet apply --verbose --hiera_config ${BOOTSTRAP_PUPPET}/hiera.yaml --modulepath=${BOOTSTRAP_PUPPET}/modules/ ${BOOTSTRAP_PUPPET}/manifests/bootstrap.pp
+puppet apply --verbose --hiera_config ${BOOTSTRAP_PUPPET}/hiera.yaml --modulepath=${BOOTSTRAP_PUPPET}/modules/ ${BOOTSTRAP_PUPPET}/manifests/bootstrap.pp
 sed -i '/127.0.1.1\(.*\)/d' /etc/hosts
 ifup eth0
 
