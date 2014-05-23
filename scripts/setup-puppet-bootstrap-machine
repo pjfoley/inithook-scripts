@@ -13,6 +13,7 @@ DISTRO="${DISTRO:=$(lsb_release -is | tr '[A-Z]' '[a-z]')}"
 GEMS="${GEMS:=r10k}"
 
 R10K_BOOTSTRAP="${R10K_BOOTSTRAP:=/root/tmp/bootstrap/r10k_bootstrap.yaml}"
+FACTER_BOOTSTRAP="${FACTER_BOOTSTRAP:=/root/tmp/bootstrap/bootstrap-machine.config}"
 BOOTSTRAP_PUPPET="${BOOTSTRAP_PUPPET:=/root/tmp/bootstrap/puppet/environments/production}"
 
 ###############################################################
@@ -41,7 +42,7 @@ echo $'\t'"* Deploy r10k configuration"
 /usr/local/bin/r10k deploy environment -p -c ${R10K_BOOTSTRAP}
 
 echo $'\t'"* Configure base machine settings"
-puppet apply --verbose --hiera_config ${BOOTSTRAP_PUPPET}/hiera.yaml --modulepath=${BOOTSTRAP_PUPPET}/modules/ ${BOOTSTRAP_PUPPET}/manifests/bootstrap.pp
+sh -c "$(cat $FACTER_BOOTSTRAP | tr '\n' ' ' ) puppet apply --verbose --hiera_config ${BOOTSTRAP_PUPPET}/hiera.yaml --modulepath=${BOOTSTRAP_PUPPET}/modules/ ${BOOTSTRAP_PUPPET}/manifests/bootstrap.pp"
 sed -i '/127.0.1.1\(.*\)/d' /etc/hosts
 ifup eth0
 
