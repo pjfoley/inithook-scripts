@@ -33,6 +33,9 @@ fi
 echo $'\t'"* Updating package index files"
 apt-get update >/dev/null
 
+echo $'\t'"Git ignore the puppet directory"
+grep -qe "^puppet/*" /etc/.gitignore || echo "puppet/*" >> /etc/.gitignore
+
 echo $'\t'"* Installing Puppet Client packages - ${PACKAGES}"
 apt-get install -y ${PACKAGES} >/dev/null
 
