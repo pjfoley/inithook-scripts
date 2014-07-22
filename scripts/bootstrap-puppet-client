@@ -57,6 +57,9 @@ fi
 echo $'\t'"* Downloading - ${DEB_NAME}"
 wget -qO ${deb_path} ${PROTO_URL_DEB}
 
+echo $'\t'"Git ignore the puppet directory"
+grep -qe "^puppet/*" /etc/.gitignore || echo "puppet/*" >> /etc/.gitignore
+
 echo $'\t'"* Installing - ${DEB_NAME}"
 dpkg -i "${deb_path}" >/dev/null
 apt-get update >/dev/null
